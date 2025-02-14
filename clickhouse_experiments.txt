@@ -1,0 +1,71 @@
+
+
+
+
+---------------------------
+
+-- функции времени
+SELECT
+    toYearWeek(update_time),
+    toStartOfMonth(update_time),
+    toYYYYMM(update_time),
+    date_trunc('week', update_time)
+FROM
+    (SELECT * FROM "default"."hackernews_changes_profiles" LIMIT 100)
+
+---------------------------
+
+-- комбинатор -If
+SELECT
+    id,
+    countIf(toStartOfMonth(update_time) = '2024-08-17'),
+    countIf(update_time < '2024-08-05'),
+    avgIf(karma, update_time < '2024-08-31'),
+    argMinIf(about, update_time, update_time < '2024-09-30')
+FROM
+    (SELECT * FROM "default"."hackernews_changes_profiles" LIMIT 100000)
+GROUP BY
+    id
+
+---------------------------
+
+-- массивы
+SELECT
+	user_id,
+	groupArray(time) as ts_array,
+	groupArray(tuple(time, amount)) as ta_array,
+	-- массив кортежей дата-сумма
+	groupUniqArray(toDate(time)) as dt_array,
+	-- даты, когда покупатель у нас покупал
+FROM
+	my_table
+GROUP BY
+	user_id
+
+---------------------------
+
+-- семплирование
+SELECT
+    5 * uniqExact(profile_id) AS total_users,
+    5 * count() AS total_events
+FROM
+	raw_events
+SAMPLE 1 / 5  -- SAMPLE 1/N OFFSET M/N
+
+---------------------------
+
+GROUP BY profile_country WITH TOTALS  -- выведет еще и строку Итого
+GROUP BY year, month, day WITH ROLLUP
+
+---------------------------
+
+-- можем использовать поле, созданное в селекте, где угодно
+select
+    *,
+    1.0 * volume * swing_range market_swing_range,
+    high - low as swing_range,
+    min(price) over(partition by extract(year from date)) min_year_price
+from
+    default.stock
+where
+    symbol = 'GENR'

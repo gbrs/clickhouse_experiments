@@ -2,6 +2,59 @@
 
 
 
+
+---------------------------
+
+Песочница: https://play.clickhouse.com
+
+---------------------------
+
+
+
+---------------------------
+
+
+
+---------------------------
+
+
+
+---------------------------
+
+-- для каждой станции создать массив величин осадков на Дни Сурка
+-- и посчитать агрегатные функции.
+-- Нет покрасивее условия в WHERE (toMMDD не существует)?
+SELECT
+    station_id,
+    groupArray(precipitation) precipitation_array,
+    arrayAvg(precipitation_array) avg_precipitation,
+    arrayMin(precipitation_array) min_precipitation,
+    arrayMax(precipitation_array) max_precipitation
+FROM
+    "blogs"."noaa"
+WHERE
+    toYYYYMMDD(date) % 10000 = 202
+GROUP BY
+    station_id
+LIMIT
+    100
+
+---------------------------
+
+-- для каждой станции создать массив величин осадков на Дни Сурка
+SELECT
+    station_id,
+    groupArray(precipitation)
+FROM
+    "blogs"."noaa"
+WHERE
+    toMonth(date) = 2
+    AND toDayOfMonth(date) = 2
+GROUP BY
+    station_id
+LIMIT
+    100
+
 ---------------------------
 
 -- функции времени
@@ -59,7 +112,7 @@ GROUP BY year, month, day WITH ROLLUP
 
 ---------------------------
 
--- можем использовать поле, созданное в селекте, где угодно
+-- можем использовать поле, созданное в селекте, где угодно!
 select
     *,
     1.0 * volume * swing_range market_swing_range,

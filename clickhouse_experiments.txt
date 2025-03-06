@@ -32,6 +32,28 @@ limit 20 offset 14
 
 ---------------------------
 
+
+
+---------------------------
+
+
+
+---------------------------
+
+
+
+---------------------------
+
+SELECT
+    SUMForEach(submitted)  -- выдаст массив из трех сумм по этим позициям во всех массивах
+FROM
+    "default"."hackernews_changes_profiles"
+WHERE
+    submitted_count = 3
+    AND update_time > '2025-03-02 07:00:00'
+
+---------------------------
+
 -- для каждой станции создать массив величин осадков на Дни Сурка
 -- и посчитать агрегатные функции.
 -- Нет покрасивее условия в WHERE (toMMDD не существует)?
@@ -115,6 +137,30 @@ SELECT
 FROM
 	raw_events
 SAMPLE 1 / 5  -- SAMPLE 1/N OFFSET M/N
+
+---------------------------
+
+SELECT
+    metric,
+    toMonth(event_date) month,
+    DayOfYear(event_date) day,
+    MIN(value) min_value
+FROM
+    "system"."asynchronous_metric_log"
+WHERE
+    metric BETWEEN 'D' AND 'F'
+GROUP BY
+    metric,
+    month,
+    day
+    WITH ROLLUP
+/*
+А в песочнице подытоги и итоги в нижней части таблицы появились просто строчками,
+а не оформилось все в виде отдельных таблиц.
+*/
+
+a WITH CUBE выдаст все возможные итоги: для каждой разновидности полей по отдельности,
+для попарных сочетаний полей и общий итог
 
 ---------------------------
 

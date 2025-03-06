@@ -17,7 +17,18 @@
 
 ---------------------------
 
-
+select
+    update_time,
+    date_sub(month, 1, update_time),
+    dateName('month', update_time),
+    formatDateTime(update_time, '%Y-%m'),
+    date_trunc('month', update_time),
+    toStartOfFiveMinutes(update_time),
+    age('week', update_time, yesterday()),
+    date_diff('week', update_time, yesterday())
+from
+    hackernews_changes_profiles
+limit 20 offset 14
 
 ---------------------------
 
